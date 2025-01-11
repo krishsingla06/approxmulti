@@ -1,0 +1,149 @@
+//Design Source
+module halfadder(
+    input a,
+    input b,
+    output sum,
+    output carry
+);
+    assign sum = a ^ b;
+    assign carry = a & b;
+endmodule
+
+module fulladder(
+    input a,
+    input b,
+    input cin,
+    output sum,
+    output cout
+);
+    wire s1, c1, c2;
+    halfadder HA1(a, b, s1, c1);   
+    halfadder HA2(s1, cin, sum, c2);
+    assign cout = c1 | c2; 
+endmodule
+
+module mult3_3(
+    input [2:0] a,
+    input [2:0] b,
+    output [5:0] p
+);
+    wire a0b0, a0b1, a0b2, a1b0, a1b1, a1b2, a2b0, a2b1, a2b2;
+
+    assign a0b0 = a[0] & b[0];
+    assign a0b1 = a[0] & b[1];
+    assign a0b2 = a[0] & b[2];
+    assign a1b0 = a[1] & b[0];
+    assign a1b1 = a[1] & b[1];
+    assign a1b2 = a[1] & b[2];
+    assign a2b0 = a[2] & b[0];
+    assign a2b1 = a[2] & b[1];
+    assign a2b2 = a[2] & b[2];
+
+    
+    assign p[0] = a0b0;
+
+    
+    assign p[1] = a0b1 ^ a1b0;
+
+   
+    wire s1, c1, c2;
+    fulladder FA1(a2b0, a1b1, a0b2, s1, c1);
+    halfadder HA1(s1, a0b1 & a1b0, p[2], c2);
+    wire c3 = c1 ^ c2;
+    wire c3_ = c1 & c2;
+
+    
+    wire c4;
+    fulladder FA2(a2b1, a1b2, c3, p[3], c4);
+    fulladder FA3(a2b2, c3_, c4, p[4], p[5]);
+endmodule
+
+// Testbench
+module test_mult3_3;
+    reg [2:0] a;
+    reg [2:0] b;
+
+    wire [5:0] p;
+
+    mult3_3 uut (
+        .a(a),
+        .b(b),
+        .p(p)
+    );
+
+    initial begin
+        a = 3'b000; b = 3'b000; #10;
+        a = 3'b000; b = 3'b001; #10;
+        a = 3'b000; b = 3'b010; #10;
+        a = 3'b000; b = 3'b011; #10;
+        a = 3'b000; b = 3'b100; #10;
+        a = 3'b000; b = 3'b101; #10;
+        a = 3'b000; b = 3'b110; #10;
+        a = 3'b000; b = 3'b111; #10;
+
+        a = 3'b001; b = 3'b000; #10;
+        a = 3'b001; b = 3'b001; #10;
+        a = 3'b001; b = 3'b010; #10;
+        a = 3'b001; b = 3'b011; #10;
+        a = 3'b001; b = 3'b100; #10;
+        a = 3'b001; b = 3'b101; #10;
+        a = 3'b001; b = 3'b110; #10;
+        a = 3'b001; b = 3'b111; #10;
+
+        a = 3'b010; b = 3'b000; #10;
+        a = 3'b010; b = 3'b001; #10;
+        a = 3'b010; b = 3'b010; #10;
+        a = 3'b010; b = 3'b011; #10;
+        a = 3'b010; b = 3'b100; #10;
+        a = 3'b010; b = 3'b101; #10;
+        a = 3'b010; b = 3'b110; #10;
+        a = 3'b010; b = 3'b111; #10;
+
+        a = 3'b011; b = 3'b000; #10;
+        a = 3'b011; b = 3'b001; #10;
+        a = 3'b011; b = 3'b010; #10;
+        a = 3'b011; b = 3'b011; #10;
+        a = 3'b011; b = 3'b100; #10;
+        a = 3'b011; b = 3'b101; #10;
+        a = 3'b011; b = 3'b110; #10;
+        a = 3'b011; b = 3'b111; #10;
+
+        a = 3'b100; b = 3'b000; #10;
+        a = 3'b100; b = 3'b001; #10;
+        a = 3'b100; b = 3'b010; #10;
+        a = 3'b100; b = 3'b011; #10;
+        a = 3'b100; b = 3'b100; #10;
+        a = 3'b100; b = 3'b101; #10;
+        a = 3'b100; b = 3'b110; #10;
+        a = 3'b100; b = 3'b111; #10;
+
+        a = 3'b101; b = 3'b000; #10;
+        a = 3'b101; b = 3'b001; #10;
+        a = 3'b101; b = 3'b010; #10;
+        a = 3'b101; b = 3'b011; #10;
+        a = 3'b101; b = 3'b100; #10;
+        a = 3'b101; b = 3'b101; #10;
+        a = 3'b101; b = 3'b110; #10;
+        a = 3'b101; b = 3'b111; #10;
+
+        a = 3'b110; b = 3'b000; #10;
+        a = 3'b110; b = 3'b001; #10;
+        a = 3'b110; b = 3'b010; #10;
+        a = 3'b110; b = 3'b011; #10;
+        a = 3'b110; b = 3'b100; #10;
+        a = 3'b110; b = 3'b101; #10;
+        a = 3'b110; b = 3'b110; #10;
+        a = 3'b110; b = 3'b111; #10;
+
+        a = 3'b111; b = 3'b000; #10;
+        a = 3'b111; b = 3'b001; #10;
+        a = 3'b111; b = 3'b010; #10;
+        a = 3'b111; b = 3'b011; #10;
+        a = 3'b111; b = 3'b100; #10;
+        a = 3'b111; b = 3'b101; #10;
+        a = 3'b111; b = 3'b110; #10;
+        a = 3'b111; b = 3'b111; #10;
+
+        $stop;
+    end
+endmodule

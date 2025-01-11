@@ -1,0 +1,93 @@
+// design source
+`timescale 1ns / 1ps
+
+module mux(
+    input a,
+    input b,
+    input c,
+    input d,
+    input s1,
+    input s0,
+    output y
+);
+        assign y = (s1 == 0 && s0 == 0) ? a :
+               (s1 == 0 && s0 == 1) ? b :
+               (s1 == 1 && s0 == 0) ? c :
+               (s1 == 1 && s0 == 1) ? d :
+               0; 
+endmodule
+
+module adder2(
+    input [1:0] a,
+    input [1:0] b,
+    output [2:0] sum
+);
+    wire s0;
+    mux MUX1(0,1,1,0,a[0],b[0],s0);
+
+    wire c1;    
+    mux MUX2(0,0,0,1,a[0],b[0],c1);
+
+    wire a1xorb1;
+    mux MUX3(0,1,1,0,a[1],b[1],a1xorb1);
+
+    wire s1;
+    mux MUX4(0,1,1,0,a1xorb1,c1,s1);
+
+    wire a1andb1;
+    mux MUX5(0,0,0,1,a[1],b[1],a1andb1);
+
+    wire a1xorb1andc1;
+    mux MUX6(0,0,0,1,a1xorb1,c1,a1xorb1andc1);
+
+    wire c2;
+    mux MUX7(0,1,1,1,a1andb1,a1xorb1andc1,c2);
+
+    assign sum[0] = s0;
+    assign sum[1] = s1;
+    assign sum[2]=c2;
+endmodule
+
+// testbench
+`timescale 1ns / 1ps
+
+module adder2_tb;
+
+    reg [1:0] a;
+    reg [1:0] b;
+
+    wire [2:0] sum;
+
+    adder2 uut (
+        .a(a),
+        .b(b),
+        .sum(sum)
+    );
+
+    initial begin
+        a = 2'b00; b = 2'b00;
+        #10; 
+        
+        a = 2'b01; b = 2'b01;
+        #10;
+
+        a = 2'b10; b = 2'b01;
+        #10;
+
+        a = 2'b11; b = 2'b11;
+        #10;
+
+        a = 2'b01; b = 2'b10;
+        #10;
+
+        a = 2'b11; b = 2'b00;
+        #10;
+
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time = %0t | a = %b | b = %b | sum = %b", $time, a, b, sum);
+    end
+
+endmodule
