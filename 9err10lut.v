@@ -1,10 +1,11 @@
+
+
 module multiplier_4x4 (
-    input  [3:0] A,    // 4-bit input A
-    input  [3:0] B,    // 4-bit input B
-    output [7:0] P     // 8-bit output product
+    input  [3:0] A,   
+    input  [3:0] B, 
+    output [7:0] P     
 );
 
-// Partial product generation (AND gates)
 wire pp0_0 = A[0] & B[0];
 wire pp0_1 = A[1] & B[0];
 wire pp0_2 = A[2] & B[0];
@@ -25,6 +26,9 @@ wire pp3_1 = A[1] & B[3];
 wire pp3_2 = A[2] & B[3];
 wire pp3_3 = A[3] & B[3];
 
+// wire pr01 = (A[0] & B[1]) | (A[1] & B[0]);
+// wire g01 = A[0] & B[1] & A[1] & B[0];
+
 wire pr02 = (A[0] & B[2]) | (A[2] & B[0]);
 wire g02 = A[0] & B[2] & A[2] & B[0];
 
@@ -40,24 +44,40 @@ wire g13 = A[1] & B[3] & A[3] & B[1];
 wire pr23 = (A[2] & B[3]) | (A[3] & B[2]);
 wire g23 = A[2] & B[3] & A[3] & B[2];
 
-wire or1 = g03|g12;
+
+// wire pr01=pp0_1|pp1_0;
+// wire g01=pp0_1&pp1_0;
+// wire pr02=pp0_2|pp2_0;
+// wire g02=pp0_2&pp2_0;
+// wire pr03=pp0_3|pp3_0;
+// wire g03=pp0_3&pp3_0;
+// wire pr12=pp1_2|pp2_1;
+// wire g12=pp1_2&pp2_1;
+// wire pr13=pp1_3|pp3_1;
+// wire g13=pp1_3&pp3_1;
+// wire pr23=pp2_3|pp3_2;
+// wire g23=pp2_3&pp3_2;
+
+
+//wire or1 = g03|g12;
+
+
+// wire s0,c0;
+// half_adder f0(pr01,g01,s0,c0);
 
 // wire s1,c1;
 // approx_full_adder f1(pp1_1,pr02,g02,s1,c1);
 
 // wire s2,c2;
-// approx_full_adder f2(or1,pr03,pr12,s2,c2);
+// approx_full_adder f2((A[0]&B[0]&A[3]&B[3]),pr03,pr12,s2,c2);
 
-wire s1,c1;
-//approx_full_adder f1(pp1_1,pr02,g02,s1,c1); //11
-//approx_full_adder f1(pp1_1,g02,pr02,s1,c1); 12
-//approx_full_adder f1(g02,pr02,pp1_1,s1,c1); 11
-approx_full_adder f1(g02,pp1_1,pr02,s1,c1); //11
-//approx_full_adder f1(pr02,pp1_1,g02,s1,c1); //14
-//approx_full_adder f1(pr02,g02,pp1_1,s1,c1); //16
+wire c1=pp1_1;
+wire s1=pr02;
+wire c2=(A[0]&B[0]&A[3]&B[3]);
+wire s2=pr03;
 
-wire s2,c2;
-approx_full_adder f2(pr03,pr12,or1,s2,c2);
+
+//approx_full_adder f2(or1,pr03,pr12,s2,c2);
 
 wire s3,c3;
 full_adder f3(pp2_2,pr13,g13,s3,c3);
@@ -69,6 +89,7 @@ assign P[0] = pp0_0;
 assign P[1] = (A[1] & B[0]) | (A[0] & B[1]);
 
 wire s5,c5;
+//half_adder f5(s1,c0,s5,c5);
 assign P[2] = s1;
 
 wire s6,c6;
@@ -106,7 +127,7 @@ module approx_full_adder (
     output sum, carry
 );
 
-assign sum = b;
+assign sum =b;
 assign carry = a;
 
 endmodule

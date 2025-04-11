@@ -93,6 +93,8 @@ integer counter;           // Loop counter
 real total_error;          // Accumulator for total relative error
 real mean_relative_error;  // Mean relative error
 real relative_error;       // Relative error for a single test
+real std_dev;
+real max_error;
 
 // Instantiate the approximate multiplier
 multiplier_4x4 uut (
@@ -104,6 +106,7 @@ multiplier_4x4 uut (
 initial begin
     // Initialize error accumulator
     total_error = 0.0;
+    max_error = 0.0;
 
     // Debug: Print header
     $display("Starting testbench with mean relative error calculation...");
@@ -113,6 +116,7 @@ initial begin
         // Decode A and B from the counter
         A = counter[7:4];  // Upper 4 bits represent A
         B = counter[3:0];  // Lower 4 bits represent B
+        relative_error = 0.0;
 
         // Compute the exact result
         exact_result = A * B;
@@ -120,11 +124,20 @@ initial begin
         // Wait for the multiplier to process
         #1; // Adjust delay if necessary
 
+        std_dev += (approx_result - exact_result) * (approx_result - exact_result);
+        
+
         // Compute the absolute difference manually
         if (approx_result >= exact_result) begin
             relative_error = ((approx_result - exact_result) * 100) / exact_result;
+            if(max_error < (approx_result - exact_result)) begin
+                max_error = (approx_result - exact_result);
+            end
         end else begin
             relative_error = ((exact_result - approx_result) * 100) / exact_result;
+            if(max_error < (exact_result - approx_result)) begin
+                max_error = (exact_result - approx_result);
+            end
         end
 
         // Accumulate relative error only if exact_result is non-zero
@@ -133,15 +146,24 @@ initial begin
         end
 
         // Debug: Print progress
+        if(relative_error!=0.0) begin
         $display("Test A=%d, B=%d | Approx=%d, Exact=%d | RelError=%0.4f",
                  A, B, approx_result, exact_result, relative_error);
+                end
     end
 
     // Calculate mean relative error (as a percentage)
     mean_relative_error = (total_error / 256);
 
     // Display results
-    $display("Mean Relative Error: %0.2f%%", mean_relative_error);
+   
+        $display("Mean Relative Error: %0.2f%%", mean_relative_error);
+        $display("Variance: %0.2f", std_dev/256);
+        //$display("Standard Deviation: %0.2f", sqrt(std_dev/256));
+        $display("Max Error: %0.2f", max_error);
+      // $display("Standard Deviation: %0.2f", sqrt(std_dev/256));
+        
+
 
     // End simulation
     $stop;

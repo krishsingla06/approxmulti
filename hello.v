@@ -60,17 +60,25 @@ wire g23 = A[2] & B[3] & A[3] & B[2];
 // wire g23=pp2_3&pp3_2;
 
 
-wire or1 = g03|g12;
+//wire or1 = g03|g12;
 
 
 // wire s0,c0;
 // half_adder f0(pr01,g01,s0,c0);
 
-wire s1,c1;
-approx_full_adder f1(pp1_1,pr02,g02,s1,c1);
+// wire s1,c1;
+// approx_full_adder f1(pp1_1,pr02,g02,s1,c1);
 
-wire s2,c2;
-approx_full_adder f2(pr03,pr12,or1,s2,c2);
+// wire s2,c2;
+// approx_full_adder f2((A[0]&B[0]&A[3]&B[3]),pr03,pr12,s2,c2);
+
+wire c1=pp1_1;
+wire s1=pr02;
+wire c2=(A[0]&B[0]&A[3]&B[3]);
+wire s2=pr03;
+
+
+//approx_full_adder f2(or1,pr03,pr12,s2,c2);
 
 wire s3,c3;
 full_adder f3(pp2_2,pr13,g13,s3,c3);
@@ -122,17 +130,6 @@ module approx_full_adder (
 
 assign sum =b;
 assign carry = a;
-
-endmodule
-
-module approx_4_2compressor (
-    input a, b, c, d,
-    output sum, carry
-);
-
-//assign sum = (a&b)&(c&d) | (a&b)&(c|d);
-assign sum = a|b|c|d;
-assign carry = a|b;
 
 endmodule
 
