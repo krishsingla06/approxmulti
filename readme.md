@@ -65,4 +65,15 @@ Vivado utilization and power summaries are as follows:
 - Dynamic control over the trade-off between power and precision
 - ML-driven design space exploration for additional logic minimisation
 
+## How to Run
+
+You will need two steps to run the code in VSCode:
+
+1. In terminal, run the following command to compile the code:
+   `iverilog -o am_out.vvp multiplier_tb.v multiplier.v`
+2. Then run the following command to simulate the code:
+   `vvp am_out.vvp`
+
+In Vivado, you can simply run simulation and synthesis using the GUI.
+
 ---
