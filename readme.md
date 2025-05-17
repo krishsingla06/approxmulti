@@ -8,7 +8,7 @@
 
 **Institute:** Indian Institute of Technology, Roorkee
 
-**Open Project:** Approximate 4x4 Multiplier (PAaC IITR)
+**Open Project:** Approximate 4x4 Multiplier (PaAC IITR)
 
 # Approximation of the 4x4 Multiplier (10 LUT, <10% MRE - Mean Relative Error)
 
